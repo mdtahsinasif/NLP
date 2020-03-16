@@ -1,0 +1,78 @@
+# Importing libraries
+import nltk
+import re
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+import pandas as pd
+from pymongo import MongoClient
+
+# Input the file
+dbtext = ''
+
+val = input("Enter word combination  Value:")
+val = int(val)
+
+
+host = 'localhost'
+port = 27017
+
+print('We are in dbConnection.py')
+try:
+    connection = MongoClient('localhost', 27017)
+    db = connection.core
+    collection = db.rss_feed_entry
+    for x in collection.find({}, {"_id": 0, "description": 1}).limit(20):
+       # print(x['description'])
+        dbtext = dbtext + (x['description'])
+    print('dbtext->', dbtext)
+    dbtext1 =   list(dbtext.split(" "))
+    print("Connected successfully!!!")
+except:
+    print("Could not connect to MongoDB")
+
+# Preprocessing
+def remove_string_special_characters(s):
+    # removes special characters with ' '
+    stripped = re.sub('[^a-zA-z\s]', '', s)
+    stripped = re.sub('_', '', stripped)
+
+    # Change any white space to one space
+    stripped = re.sub('\s+', ' ', stripped)
+
+    # Remove start and end white spaces
+    stripped = stripped.strip()
+    if stripped != '':
+        return stripped.lower()
+
+    # Stopword removal
+
+
+stop_words = set(stopwords.words('english'))
+your_list = ['skills', 'ability', 'The', 'description']
+for i, line in enumerate(dbtext1):
+    dbtext1[i] = ' '.join([x for
+                        x in nltk.word_tokenize(line) if
+                        (x not in stop_words) and (x not in your_list)])
+
+# Getting trigrams
+vectorizer = CountVectorizer(ngram_range=(val, val))
+X1 = vectorizer.fit_transform(dbtext1)
+features = (vectorizer.get_feature_names())
+#print("\n\nFeatures : \n", features)
+#print("\n\nX1 : \n", X1.toarray())
+
+# Applying TFIDF
+vectorizer = TfidfVectorizer(ngram_range=(val, val))
+X2 = vectorizer.fit_transform(dbtext1)
+scores = (X2.toarray())
+#print("\n\nScores : \n", scores)
+
+# Getting top ranking features
+sums = X2.sum(axis=0)
+data1 = []
+for col, term in enumerate(features):
+    data1.append((term, sums[0, col]))
+ranking = pd.DataFrame(data1, columns=['term', 'rank'])
+words = (ranking.sort_values('rank', ascending=False))
+print("\n\nWords head : \n", words.head(7))
