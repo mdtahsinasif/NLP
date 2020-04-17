@@ -1,0 +1,120 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Thu Apr 16 13:26:39 2020
+
+@author: tahsin.asif
+"""
+
+import collections
+from nltk import word_tokenize
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from sklearn.cluster import KMeans
+from sklearn.feature_extraction.text import TfidfVectorizer
+from pymongo import MongoClient
+import matplotlib.pyplot as plt
+from pprint import pprint
+
+
+def word_tokenizer(text):
+    # tokenizes and stems the text
+    tokens = word_tokenize(text)
+    stemmer = PorterStemmer()
+    tokens = [stemmer.stem(t) for t in tokens if t not in stopwords.words('english')]
+    return tokens
+
+
+def cluster_sentences(sentences, nb_of_clusters=5):
+    tfidf_vectorizer = TfidfVectorizer(tokenizer=word_tokenizer,
+                                       stop_words=stopwords.words('english'),
+                                       max_df=0.9,
+                                       min_df=0.1,
+                                       lowercase=True)
+    # builds a tf-idf matrix for the sentences
+    tfidf_matrix = tfidf_vectorizer.fit_transform(sentences)
+    kmeans = KMeans(n_clusters=nb_of_clusters)
+    kmeans.fit(tfidf_matrix)
+    clusters = collections.defaultdict(list)
+    plt.clf()  # clear the figure
+    cost = []
+    for i in range(1, 11):
+        KM = KMeans(n_clusters=i, max_iter=500)
+        KM.fit(tfidf_matrix)
+
+        # calculates squared error
+        # for the clustered points
+        cost.append(KM.inertia_)
+
+        # plot the cost against K values
+    plt.plot(range(1, 11), cost, color='g', linewidth='3')
+    plt.xlabel("Value of K")
+    plt.ylabel("Sqaured Error (Cost)")
+    plt.show()  # clear the plot
+
+    # the point of the elbow is the
+    # most optimal value for choosing k
+    for i, label in enumerate(kmeans.labels_):
+        clusters[label].append(i)
+    return dict(clusters)
+
+
+if __name__ == "__main__":
+    sentences1 = ["Human machine interface for lab abc computer applications",
+                 "A survey of user opinion of computer system response time",
+                 "The EPS user interface management system",
+                 "System and human system engineering testing of EPS",
+                 "Relation of user perceived response time to error measurement",
+                 "The generation of random binary unordered trees",
+                 "The intersection graph of paths in trees",
+                 "Graph minors IV Widths of trees and well quasi ordering",
+                 "Graph minors A survey"]
+    sentences = []
+    try:
+        connection = MongoClient(..............)
+        db = connection.core
+        collection = db................
+        mydoc = collection.find({'title': {'$exists': True}}).limit(500)
+        print("Connected successfully!!!")
+        for x in mydoc:
+            # inserting object id as key and description as value in Mongo
+            #sno = sno + 1
+            sentences.append(x['title'])
+
+
+    except:
+        print("Could not connect to MongoDB")
+
+   # print(sentences)
+
+    nclusters = 6
+    clusters = cluster_sentences(sentences, nclusters)
+    clusterdict = {}
+    for cluster in range(nclusters):
+        output = []
+       # print ("cluster ",cluster,":")
+        clusterNumber = "Cluster::" + str(cluster)
+        key = (clusterNumber)
+        for i, sentence in enumerate(clusters[cluster]):
+         #   print ("\tsentence ",i,": ",sentences[sentence])
+          #  output.append(("sentence:" + str(i) + ": ", sentences[sentence]))
+            output.append((sentences[sentence]))
+            value = (output)
+        clusterdict[key] = value
+
+    #print((clusterdict))
+
+    for key , value in clusterdict.items():
+        print(key,'------->>>',value)
+
+    try:
+        connection = MongoClient(...............)
+        db = connection.core
+        collection = db.................
+        for key, value in clusterdict.items():
+            print(key, '------->>>', value)
+            myquery = {"_id": key}
+            newvalues = {"$set": {"titles": value}}
+            collection.update_many(myquery, newvalues)
+        print("=================")
+    except:
+        print("Could not connect to MongoDB")
