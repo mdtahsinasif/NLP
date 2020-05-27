@@ -19,7 +19,7 @@ from sklearn.externals import joblib
 from sklearn.metrics import accuracy_score, recall_score, precision_score, f1_score
 
 
-news_df = pd.read_excel("C:/Users/tahsin.asif/OneDrive - CYFIRMA INDIA PRIVATE LIMITED/AI/JavaCategorisation/PythonModel/CywareClassificationData.xlsx",encoding='ISO-8859-1')
+news_df = pd.read_excel("/CywareClassificationData.xlsx",encoding='ISO-8859-1')
 news_df.CATEGORY.unique()
 
 
@@ -122,7 +122,7 @@ predictions
 #print(grid_voting_estimator.score(X_train, y_train))
 ###################
 
-path = 'C:/Users/tahsin.asif/OneDrive - CYFIRMA INDIA PRIVATE LIMITED/AI/JavaCategorisation/PythonModel'
+path = '...AI/JavaCategorisation/PythonModel'
 #copy the model to pkl file and keep the model file at required server location
 #joblib.dump(svc,os.path.join(path, 'svm_text_classifierV2.pkl') )
 joblib.dump(naive_bayes_text_classifier,os.path.join(path, 'naive_bayes_text_classifierV3.pkl') )
