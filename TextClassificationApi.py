@@ -22,7 +22,7 @@ def predict():
     #inputData = json_
     url_test = pd.DataFrame([json_])
     print('url_test item data---->',url_test['data'])
-    df = pd.read_excel("C:/Users/tahsin.asif/OneDrive - CYFIRMA INDIA PRIVATE LIMITED/AI/JavaCategorisation/PythonModel/CywareClassificationData.xlsx",encoding='ISO-8859-1')
+    df = pd.read_excel("............/CywareClassificationData.xlsx",encoding='ISO-8859-1')
   #  df.dropna(subset=["TITLE"], inplace=True)
     df['TITLE'] = df.TITLE.astype(str).map(
     lambda x: x.lower().translate(str.maketrans('','', string.punctuation)))
@@ -53,7 +53,7 @@ def predict():
     print('output----------->',output) 
     return jsonify(pd.Series(output).to_json(orient='values'))
 
-MODEL_FILE = 'C:/Users/tahsin.asif/OneDrive - CYFIRMA INDIA PRIVATE LIMITED/AI/JavaCategorisation/PythonModel/naive_bayes_text_classifierV3.pkl'
+MODEL_FILE = '----------/naive_bayes_text_classifierV3.pkl'
 log_estimator = joblib.load(MODEL_FILE)
 if __name__ == '__main__':
     log_estimator = joblib.load(MODEL_FILE)
