@@ -10,7 +10,7 @@ from csv import reader
 
 from csv import reader
 # open file in read mode
-with open('C:/Users/tahsin.asif/OneDrive - CYFIRMA INDIA PRIVATE LIMITED/AI/DarkWebScrapper/DarkWebCSVInput.csv', 'r') as read_obj:
+with open('......OneDrive - CYFIRMA INDIA PRIVATE LIMITED/AI/DarkWebScrapper/DarkWebCSVInput.csv', 'r') as read_obj:
     # pass the file object to reader() to get the reader object
     csv_reader = reader(read_obj)
     # Iterate over each row in the csv using reader object
@@ -36,7 +36,7 @@ class SoupScraper():
         self.logger.info('Starting getLinks for ' + org_name + ' org id ' + str(org_id))
         #url = 'http://searchcoaupi3csb.onion/search/?q=' + org_name
         #url = 'http://searchcoaupi3csb.onion/search/?q=' + org_name + '&ex_q=timestamp%3A[now%2Fd-1M+TO+*]&sdh=&'
-        with open('C:/Users/tahsin.asif/OneDrive - CYFIRMA INDIA PRIVATE LIMITED/AI/DarkWebScrapper/DarkWebCSVInput.csv', 'r') as read_obj:
+        with open('............OneDrive - CYFIRMA INDIA PRIVATE LIMITED/AI/DarkWebScrapper/DarkWebCSVInput.csv', 'r') as read_obj:
             # pass the file object to reader() to get the reader object
             csv_reader = reader(read_obj)
             # Iterate over each row in the csv using reader object
@@ -47,7 +47,7 @@ class SoupScraper():
 
         
         #url = 'http://searchcoaupi3csb.onion/search/?q=' + org_name + '&ex_q=timestamp%3A[now%2Fd-1y+TO+*]&sdh=&'
-                proxies = {"http": "127.0.0.1:8118"}
+                proxies = {}
                 try:
                     page= requests.get(url, proxies=proxies, timeout=30)
                 except requests.Timeout:
