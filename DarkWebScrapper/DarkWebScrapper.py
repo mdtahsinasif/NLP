@@ -9,7 +9,7 @@ from selenium import webdriver
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import pandas as pd
 
-binary = FirefoxBinary('C:/Users/tahsin.asif/Desktop/Tor Browser/Browser/firefox')
+binary = FirefoxBinary('..../Tor Browser/Browser/firefox')
 service_args = [ '--proxy=localhost:9150', '--proxy-type=socks5', ]
 
 driver = webdriver.PhantomJS(service_args=service_args)
