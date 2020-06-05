@@ -18,7 +18,7 @@ driver = webdriver.PhantomJS(service_args=service_args)
 print(driver.page_source)
 
 ##for captcha reading
-url = "http://finedumps3ml4k3u.onion/"
+url = "...."
 driver.get(url)
 driver.implicitly_wait(10000)
 #pip install cssselect
@@ -34,7 +34,7 @@ def form_parsing(html):
       if e.get('name'):
          data[e.get('name')] = e.get('value')
    return data
-REGISTER_URL = 'thehuboy27kracz6sdql2r7c324vrs5aok2e33gorrikccaqhvzfcvad.onion'
+REGISTER_URL = '.'
 ckj = cookielib.CookieJar()
 browser = urllib2.build_opener(urllib2.HTTPCookieProcessor(ckj))
 driver.get(url)
