@@ -16,7 +16,7 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 
 
 class SoupScraper():
-    # client = MongoClient('mongodb://appmongouser:XWDXJd2WIc3MFGI8@prod-shard-00-00-agp94.mongodb.net:27017,prod-shard-00-01-agp94.mongodb.net:27017,prod-shard-00-02-agp94.mongodb.net:27017,prod-shard-00-03-agp94.mongodb.net:27017,prod-shard-00-04-agp94.mongodb.net:27017,prod-shard-00-05-agp94.mongodb.net:27017,prod-shard-00-06-agp94.mongodb.net:27017/test?ssl=true&replicaSet=Prod-shard-0&authSource=admin&retryWrites=true&w=majority&readPreference=nearest')
+ 
     client = MongoClient('localhost', 27017)
     db = client.core
     collection = db.dark_web
@@ -40,7 +40,7 @@ class SoupScraper():
         url = 'https://www.cars.com/shopping/'
         print(url)
         # url = 'http://searchcoaupi3csb.onion/search/?q=' + org_name + '&ex_q=timestamp%3A[now%2Fd-1y+TO+*]&sdh=&'
-        # proxies = {"http": "127.0.0.1:8118"}
+       
         # proxies = {"http": "localhost:9150"}
         try:
             #  page= requests.get(url, proxies=proxies, timeout=30)
@@ -209,7 +209,7 @@ class SoupScraper():
 #
 #    def getOrgs(self):
 #        self.logger.info('Starting getOrgs')
-#        #db = MySQLdb.connect("jp-rds01.c7tohwlgi9s5.ap-northeast-1.rds.amazonaws.com","cyorguser","bkTQAp76YU29ZD45dBJ5CjvN","org")
+#       
 #
 #        cursor = db.cursor()
 #        cursor.execute("SELECT * FROM org where status='Active'")
@@ -218,7 +218,7 @@ class SoupScraper():
 #            row = cursor.fetchone()
 #            self.getLinks(row[1], row[0], 'Company')
 #        db.close()
-binary = FirefoxBinary('C:/Users/tahsin.asif/Desktop/Tor Browser/Browser/firefox')
+binary = FirefoxBinary(......Tor Browser/Browser/firefox')
 service_args = ['--proxy=localhost:9150', '--proxy-type=socks5', ]
 
 driver = webdriver.PhantomJS(service_args=service_args)
