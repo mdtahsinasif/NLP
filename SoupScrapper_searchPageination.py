@@ -13,9 +13,7 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 class SoupScraper():
 
-   # client = MongoClient('mongodb://appmongouser:XWDXJd2WIc3MFGI8@prod-shard-00-00-agp94.mongodb.net:27017,prod-shard-00-01-agp94.mongodb.net:27017,prod-shard-00-02-agp94.mongodb.net:27017,prod-shard-00-03-agp94.mongodb.net:27017,prod-shard-00-04-agp94.mongodb.net:27017,prod-shard-00-05-agp94.mongodb.net:27017,prod-shard-00-06-agp94.mongodb.net:27017/test?ssl=true&replicaSet=Prod-shard-0&authSource=admin&retryWrites=true&w=majority&readPreference=nearest')
-    #db = client.core
-    #collection = db.dark_web_search
+
     logging.basicConfig(filename="SoupScraper.log",
                     format='%(asctime)s %(message)s',
                     filemode='w')
@@ -27,7 +25,7 @@ class SoupScraper():
         
         try:
             
-            url = "http://searchcoaupi3csb.onion/search/?q="+org_name+"&num=10&sort="
+            url = ""
             print("IFURL:",url) 
             driver.get(url)
             homePageText = driver.find_element_by_xpath('/html').text
@@ -250,7 +248,7 @@ class SoupScraper():
 
 
 
-binary = FirefoxBinary('C:/Users/tahsin.asif/Desktop/Tor Browser/Browser/firefox')
+binary = FirefoxBinary('firefox')
 service_args = ['--proxy=localhost:9150', '--proxy-type=socks5', ]
 dataDic={}
 
