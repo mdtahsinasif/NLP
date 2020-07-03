@@ -1,8 +1,6 @@
 import csv
-
-import requests
+from csv import reader
 from bs4 import BeautifulSoup
-import pymongo
 import re
 from pymongo import MongoClient
 # import MySQLdb
@@ -10,10 +8,12 @@ import datetime
 import logging
 from nltk.tokenize import word_tokenize, sent_tokenize
 from selenium import webdriver
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support import expected_conditions as EC
 from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
-from xlwings.constants import TimeUnit
+from selenium.webdriver.support.wait import WebDriverWait
+from selenium.webdriver.common.by import By
 
 
 class SoupScraper():
@@ -27,17 +27,24 @@ class SoupScraper():
     logger.setLevel(logging.DEBUG)
 
     def count_page(self, org_name_uri):
+        url = ''
         try:
             last_page = ""
-            url = "http://searchcoaupi3csb.onion/search/?q=" + org_name + "&num=10&sort="
-          #  print("IFURL:", url)
-        #    driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
-           # driver.set_page_load_timeout(10)
-            driver.get(url)
-            page = driver.page_source
-            soup = BeautifulSoup(page, 'html.parser')
-            # print(soup)
-            paging = soup.find("div", {"class": "row", "id": ""}).find("ul", {"class": "pagination"}).find_all("a")
+            if(url == ('http://dnpscnbaix6nkwvystl3yxglz7nteicqrou3t75tpcc5532cztc46qyd.onion/')):
+               print("")
+               driver.get(url)
+               page = driver.page_source
+               soup = BeautifulSoup(page, 'html.parser')
+               # print(soup)
+               paging = soup.find("div", {"class": "row", "id": ""}).find("ul", {"class": "pagination"}).find_all("a")
+            else:
+                url = "http://searchcoaupi3csb.onion/search/?q=" + org_name + "&num=10&sort="
+                driver.get(url)
+                page = driver.page_source
+                soup = BeautifulSoup(page, 'html.parser')
+                # print(soup)
+                paging = soup.find("div", {"class": "row", "id": ""}).find("ul", {"class": "pagination"}).find_all("a")
+
             #    print(paging)
             start_page = paging[1].text
             #   print("Start Page", start_page)
@@ -61,26 +68,29 @@ class SoupScraper():
                     if x == 0:
                         url = "http://searchcoaupi3csb.onion/search/?q=" + org_name + "&num=10&sort="
                         try:
-                         #   driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
-                         #   driver.set_page_load_timeout(10)
+                            # uncomment for server
+                            #linkPageText= requests.get(url, proxies=proxies, timeout=30)
+                            #t = html.fromstring(linkPageText.content)
+
+                            # uncomment for local
                             driver.get(url)
                             linkPageText = driver.page_source
+
                             soup = BeautifulSoup(linkPageText, 'lxml')
                             i = 0
                             for link in soup.findAll('a', attrs={'href': re.compile("^http://")}):
                                 i = (i + 1)
                                 print("linkCounter::->",i)
                             #    print("Link in for loop ::->", link['href'])
+                                #comment on server
                                 linkTextVal = driver.find_element_by_xpath('/html/body/main/div[2]/ol/'+'li['+str(i)+']/div[1]/div').text
+
+                                #uncomment on server
+                                # linkTextVal = t.xpath(
+                                #     '/html/body/main/div[2]/ol/' + 'li[' + str(i) + ']/div[1]/div/text()')
+
                                 linkTextkey = link.text
                                 self.logger.info(link['href'])
-                                ##########
-                               #  driver.get(link['href'])
-                               #  page = driver.page_source
-                               #  soup = BeautifulSoup(page, 'html.parser')
-                               # # [y.decompose() for y in soup.findAll("div", {"id": "header"})]
-                               #  linkPageText = driver.find_element_by_xpath('/html').text
-                                ##########
                                 keys = linkTextkey
                                 dw[keys] = linkTextVal
                         except:
@@ -90,50 +100,69 @@ class SoupScraper():
                         try:
                             url = "http://searchcoaupi3csb.onion/search/move/?q=" + org_name + "&pn=" + str(
                                 x + 1) + "&num=10&sdh=&"
-                        #    driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
-                    #        driver.set_page_load_timeout(10)
+                            # uncomment for server
+                            # linkPageText= requests.get(url, proxies=proxies, timeout=30)
+                            # t = html.fromstring(linkPageText.content)
+
+                            #comment for server
                             driver.get(url)
                             linkPageText = driver.page_source
+                            #
                             soup = BeautifulSoup(linkPageText, 'lxml')
                             i = 0
                             for link in soup.findAll('a', attrs={'href': re.compile("^http://")}):
                                 i = (i + 1)
                                 print("linkCounter::->", i)
                                 #    print("Link in for loop ::->", link['href'])
+                                #Uncomment on server
+                                # t = html.fromstring(linkPageText.content)
+                                # linkTextVal = t.xpath(
+                                #     '/html/body/main/div[2]/ol/' + 'li[' + str(i) + ']/div[1]/div/text()')
+
+                                #Comment on server
                                 linkTextVal = driver.find_element_by_xpath(
                                     '/html/body/main/div[2]/ol/' + 'li[' + str(i) + ']/div[1]/div').text
+                                ##
+
                                 linkTextkey = link.text
                                 self.logger.info(link['href'])
-                                ##########
-                                # driver.get(link['href'])
-                                # page = driver.page_source
-                                # soup = BeautifulSoup(page, 'html.parser')
-                                # [y.decompose() for y in soup.findAll("div", {"id": "header"})]
-                                # linkPageText = driver.find_element_by_xpath('/html').text
-                                ##########
                                 keys = linkTextkey
                                 dw[keys] = linkTextVal
                         except:
                             continue
 
                     print("Length of Dictionary:::", len(dw))
-            elif(domain == ("http://depastedihrn3jtw.onion/top.php")):
-                scraper._getUrlInfo(domain)
-            elif(domain ==("http://suprbayoubiexnmp.onion/")):
-                scraper._getUrlInfo(domain)
+
             elif(domain ==('http://nzxj3il7lr6qmouq.onion/trending/month')):
+                counter = scraper.count_page(domain)
+                print("counter value:::->", counter)
                 for x in range (int(1)):
                     domain = 'http://nzxj3il7lr6qmouq.onion/trending/month?page'+str(x+1)
                     print("Domain:::->", domain)
                     scraper._getUrlInfo(domain)
-            elif (('http://answerszuvs3gg2l64e6hmnryudl5zgrmwm3vh65hzszdghblddvfiqd.onion') in domain):
+            elif (domain == ('http://dnpscnbaix6nkwvystl3yxglz7nteicqrou3t75tpcc5532cztc46qyd.onion')):
+                counter = scraper.count_page(domain)
+                print("counter-->", counter)
+                xpath = '/html/body/div[1]'
+                for x in range(int(counter)):
+                    if x != 0:
+                        url = domain + "?page=" + str(x)
+                        print("inside Domain")
+                        driver.get(url)
+                        linkTextVal = driver.find_element_by_xpath(
+                            xpath).text
+                        #   print("linkTextVal:::->",linkTextVal)
+                        linkTextkey = url
+                        #   self.logger.info(link['href'])
+                        dw[linkTextkey] = linkTextVal
+                        print(url + "==========================")
+            else:
                 scraper._getUrlInfo(domain)
         except:
-         print("------->")
+         self.logger.info('Exception at get Links method')
 
     def _getUrlInfo(self, url):
         print("URL in geturlinfo::----------->", url)
-        #########################
         try:
             i = 0
             homelink = ''
@@ -150,76 +179,109 @@ class SoupScraper():
                 xpath = '/html/body/div[2]/section/div[1]/div/div[2]/div'
                 xpathkey = '/html/body/div[2]/section/div/div/div[1]/div/div[1]'
                 print("URL in strongPaste::::-", url)
-            driver.get(url)
-            linkPageText = driver.page_source
-            soup = BeautifulSoup(linkPageText, 'lxml')
+            elif(url == ("http://hpoo4dosa3x4ognfxpqcrjwnsigvslm7kv6hvmhh2yqczaxy3j6qnwad.onion/")):
+                xpath = '/html/body/div/div/div/div[2]/div/div/div'
+            elif(url ==("http://hxt254aygrsziejn.onion/")):
+                xpath = '//*[@id="main"]'
+                print("xpath")
             try:
+                try:
+                    driver.get(url)
+                except TimeoutException:
+                    self.logger.info('Timed Out')
+
+                linkPageText = driver.page_source
+                #  print("linkPageText::->",linkPageText)
+                soup = BeautifulSoup(linkPageText, 'lxml')
                 for link in soup.findAll('a', attrs={'href': re.compile("^")}):
                    # print("Link in for loop::->",link)
                     try:
                         i = (i + 1)
-                        linklower = str(link.text).lower()
+                        if(url == ("http://hxt254aygrsziejn.onion/") and (link['href'].__contains__('?p='))):
+                                print(link['href'])
+                                newlink = link['href']
+                                driver.get(newlink)
+                                linkTextVal = driver.find_element_by_xpath(
+                                    xpath).text
+                                linkTextkey = link.text
+                                self.logger.info(link['href'])
+                                dw[linkTextkey] = linkTextVal
+                        else:
+                            linklower = str(link.text).lower()
+
                         keywords = ["news", 'Announcements', "download", "upload", "files", "application"
                             , "software", "hack", "threat", "program", "cyber", "hardware", "network"
                             , "discuss", "communitie", "rss", "bitcoin", "paypal", "credit", "card",
                                     "btc", "onion", "investment", "market", "letter", "money", "prepaid", "lazrus",
                                     "hitman", "top", "privacy", "censor", "discussion", 'show paste', 'security',
-                                    'deepweb', 'vpn','project','code','algorithm','virus','malware','windows','password']
+                                    'deepweb', 'vpn','project','code','algorithm','virus','malware','windows','password'
+                                    ,'read more','com','uk','p']
                         if any(x in linklower for x in keywords):
                             if ('http://answerszuvs3gg2l64e6hmnryudl5zgrmwm3vh65hzszdghblddvfiqd.onion/' in url):
                                 xpath = "/html/body/div[2]/div[2]/div/div[3]/div[2]/form/div[1]/div[1]/div[2]/div[1]/a/span"
                                 homelink = 'http://answerszuvs3gg2l64e6hmnryudl5zgrmwm3vh65hzszdghblddvfiqd.onion/'
                                 newlink = (homelink + link['href']).replace("../../", "")
-                                #   newlink = (homelink + newlink)
-                            #    print("link['href']:::-----", link['href'])
-                              #  print("newlink after filter:::->", newlink)
+                                #newlink = (homelink + newlink)
+                                #print("link['href']:::-----", link['href'])
+                                #print("newlink after filter:::->", newlink)
+                            elif('http://hpoo4dosa3x4ognfxpqcrjwnsigvslm7kv6hvmhh2yqczaxy3j6qnwad.onion/' in url):
+                                homelink = 'http://hpoo4dosa3x4ognfxpqcrjwnsigvslm7kv6hvmhh2yqczaxy3j6qnwad.onion'
+                                print("Link Href Value========>",link['href'])
+                                newlink = (homelink + link['href'])
+                               # newlink = homelink
+                                #Xpath for subpages
+                                xpath = "/html/body/div/div/div"
+                               # Xpath for Mainpage
+                              #  xpath = '/html/body/div/div/div'
+                               # print("New Link in ransomeware-->", newlink)
+                            elif (url == ('http://ekbgzchl6x2ias37.onion/') ):
+                                homelink = 'http://ekbgzchl6x2ias37.onion'
+                                newlink = (homelink + link['href'])
+                                print("newlink:::->", newlink)
+                                xpath = '/html/body/div/div/div[2]/div/div/div'
+                            elif(url ==('http://dnpscnbaix6nkwvystl3yxglz7nteicqrou3t75tpcc5532cztc46qyd.onion')):
+                                print("========================")
+                                xpath = '//*[@id="content-101"]'
+                                homelink = ""
+                                newlink = url
+                            elif (url == ('http://hxt254aygrsziejn.onion/')):
+
+                                newlink == link['href']
+                                print("new link::->", newlink)
                             else:
                                 newlink = (homelink + link['href'])
                             try:
-                           #     driver.manage().timeouts().pageLoadTimeout(30, TimeUnit.SECONDS);
-                           #     driver.set_page_load_timeout(10)
-                                driver.get(newlink)
-                             #   print("newlink::::->",newlink)
+                                 driver.get(newlink)
+
+                            except TimeoutException:
+                                self.logger.info('Timed Out')
+                                wait = WebDriverWait(driver, 10)
+                                wait.until(EC.visibility_of_element_located((By.TAG_NAME, "p")))
                                 linkTextVal = driver.find_element_by_xpath(
                                     xpath).text
-                              #  print('linkTextVal-->', linkTextVal)
-                                if ("http://nzxj3il7lr6qmouq.onion/trending/month" in url):
+
+                                print(newlink+"=========================="+linkTextVal)
+                                if("http://nzxj3il7lr6qmouq.onion/trending/month" in url):
+
                                     linkTextValkey = driver.find_element_by_xpath(
                                         xpathkey).text
                                   #  print(url+ "::->", linkTextValkey)
                                     linkTextkey = linkTextValkey
+
                                 else:
                                     linkTextkey = link.text
-                                #print('linkTextkey:::->', linkTextkey)
-                                #print('linkTextVal::->', linkTextVal)
                                 self.logger.info(link['href'])
                                 dw[linkTextkey] = linkTextVal
-                            except:
-                                #driver.set_page_load_timeout():
+                            except TimeoutException:
                                 self.logger.info('Timed Out')
-                    except:
-                        self.logger.info("")
-            except:
-                self.logger.info("")
-        except:
-            self.logger.info("")
-        ########################
 
-    # def update(self):
-    #     try:
-    #         db = connection.core
-    #         collection = db.dark_web
-    #         mydoc = collection.find()
-    #
-    #         for key in mydoc:
-    #             #  print(key['_id'])
-    #             for key, value in dw.items():
-    #                 # print(key)
-    #                 myquery = {"_id": key}
-    #                 newvalues = {"$set": {"Data": value}}
-    #                 collection.update_many(myquery, newvalues)
-    #     except Exception as e:
-    #         logging.error("Exception Occured", exc_info=True)
+                    except TimeoutException:
+                        self.logger.info("Timed Out")
+            except TimeoutException:
+                self.logger.info("Timed Out")
+        except TimeoutException:
+            self.logger.info("Timed Out")
+
 
     def _create_frequency_table(self, text_string) -> dict:
         """
@@ -354,21 +416,22 @@ class SoupScraper():
             logging.error("Exception Occured", exc_info=True)
 
 
-binary = FirefoxBinary('C:/Users/tahsin.asif/Desktop/Tor Browser/Browser/firefox')
+#binary = FirefoxBinary('C:/Users/tahsin.asif/Desktop/Tor Browser/Browser/firefox')
 service_args = ['--proxy=localhost:9150', '--proxy-type=socks5', ]
 dataDic = {}
 
 # scraper.getOrgs()
 if __name__ =='__main__':
-    connection = MongoClient('localhost', 27017)
+    #server Proxies iput
+    proxies = {"http": "127.0.0.1:8118"}
+    connection = MongoClient('localhost',27017)
     db = connection.core
     collection = db.dark_web
     driver = webdriver.PhantomJS(service_args=service_args)
+
     scraper = SoupScraper()
     dw = {}
     org_name = "exploit"
-    from csv import reader
-
     # open file in read mode
     with open('DarkWebCSVInput.csv',
               'r') as read_obj:
@@ -395,4 +458,3 @@ if __name__ =='__main__':
                      employee_writer.writerow([k + "----------->", v])
 
         print("Length of dict::->",len(dw))
-       # # collection.update_many(dw)
