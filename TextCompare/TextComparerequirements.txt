@@ -1,0 +1,6 @@
+Flask==1.1.1
+json5==0.8.5
+requests==2.22.0
+spacy==2.3.2
+pandas==0.25.1
+
